@@ -1,0 +1,38 @@
+# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP.NET Core service.
+
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - 5036:8080
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=dev_db;Username=dev_user;Password=changeme;
+      - Jwt__Key=my_super_secure_secret_key_that_is_32+_chars
+      - Jwt__Issuer=MyIssue
+      - Jwt__Audience=MyAudience
+      - Jwt__ExpireTimeInMinutes=180
+      - Jwt__ExpireTimeEmailValidationInMinutes=30
+    command: >
+      bash -c "
+        dotnet ProjectTemplate.dll
+      "
+  
+  db:
+    image: postgres:18-alpine3.23
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: dev_db
+      POSTGRES_USER: dev_user
+      POSTGRES_PASSWORD: changeme
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+volumes:
+  pg_data:    

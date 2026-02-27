@@ -1,6 +1,8 @@
+using System.Collections;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.Collections;
+
 using ProjectTemplate.Application.Dto;
 
 namespace ProjectTemplate.Helpers;
@@ -10,14 +12,18 @@ public static class ResponseViewModelExtension
     public static IActionResult ToActionResult<T, K>(this ResponseDto<T, K> result, ControllerBase controller)
     {
         if (result.IsSuccess)
+        {
             return controller.StatusCode(result.StatusCode, result.Data);
+        }
 
         if (result.Errors is null)
+        {
             return controller.StatusCode(result.StatusCode);
+        }
 
         var modelState = new ModelStateDictionary();
 
-        foreach (var kv in result.Errors)
+        foreach (KeyValuePair<string, K> kv in result.Errors)
         {
             if (kv.Value is string singleError)
             {
@@ -25,7 +31,7 @@ public static class ResponseViewModelExtension
             }
             else if (kv.Value is IEnumerable enumerableErrors)
             {
-                foreach (var error in enumerableErrors)
+                foreach (object? error in enumerableErrors)
                 {
                     modelState.AddModelError(kv.Key, error?.ToString() ?? "");
                 }

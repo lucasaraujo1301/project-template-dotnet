@@ -1,4 +1,4 @@
-﻿namespace TestProjectTemplate;
+namespace TestProjectTemplate;
 
 public class UnitTest1
 {
